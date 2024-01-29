@@ -14,10 +14,11 @@ import { moduleName } from '../../..';
 
 const TptPatientSummary: React.FC<PatientChartProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { obsConcepts, encounterTypes } = useConfig();
+  const { config, obsConcepts, encounterTypes } = useConfig();
 
   const headerRecentTPT = t('recentTptCases', 'Recent TPT Cases');
   const headerPreviousCases = t('previousTptCases', 'Previous TPT Cases');
+  const headerVisits = t('visits', 'Visits');
 
   const recentTbPreventionColumns: SummaryCardColumn[] = useMemo(
     () => [
@@ -53,20 +54,46 @@ const TptPatientSummary: React.FC<PatientChartProps> = ({ patientUuid }) => {
           return getObsFromEncounter(encounter, obsConcepts.tptRegimen);
         },
       },
-       {
-         key: 'tptAdherence',
-         header: t('tptAdherence', 'Adherence'),
-         encounterTypes: [encounterTypes.tptTreatmentAndFollowUp],
-         getObsValue: (encounter) => {
-           return getObsFromEncounter(encounter, obsConcepts.tptAdherence);
-         },
-       },
+      {
+        key: 'tptAdherence',
+        header: t('tptAdherence', 'Adherence'),
+        encounterTypes: [encounterTypes.tptTreatmentAndFollowUp],
+        getObsValue: (encounter) => {
+          return getObsFromEncounter(encounter, obsConcepts.tptAdherence);
+        },
+      },
       {
         key: 'tptAppointmentDate',
         header: t('nextAppointmentDate', 'Next Appointment Date'),
         encounterTypes: [encounterTypes.tptTreatmentAndFollowUp],
         getObsValue: (encounter) => {
           return getObsFromEncounter(encounter, obsConcepts.tptAppointmentDate, true);
+        },
+      },
+    ],
+    [],
+  );
+
+  const previousCasesColumns: EncounterListColumn[] = useMemo(
+    () => [
+      {
+        key: 'tptTreatmentID',
+        header: t('tptTreatmentID', 'tpt Treatment ID'),
+        getValue: (encounter) => {
+          return getObsFromEncounter(encounter, config.obsConcepts.tptTreatmentID);
+        },
+      },
+    ],
+    [],
+  );
+
+  const visitsColumns: EncounterListColumn[] = useMemo(
+    () => [
+      {
+        key: 'tptTreatmentID',
+        header: t('tptTreatmentID', 'tpt Treatment ID'),
+        getValue: (encounter) => {
+          return getObsFromEncounter(encounter, config.obsConcepts.tptTreatmentID);
         },
       },
     ],
@@ -81,7 +108,32 @@ const TptPatientSummary: React.FC<PatientChartProps> = ({ patientUuid }) => {
         columns={recentTbPreventionColumns}
         maxRowItems={4}
       />
-      <EmptyStateComingSoon displayText={headerPreviousCases} headerTitle={headerPreviousCases}/>
+      <EncounterList
+        patientUuid={patientUuid}
+        encounterType={config.encounterTypes.tptCaseEnrollment}
+        columns={previousCasesColumns}
+        description={headerPreviousCases}
+        headerTitle={headerPreviousCases}
+        formList={[{ name: 'TPT Case Enrolment form' }]}
+        launchOptions={{
+          hideFormLauncher: true,
+          displayText: '',
+          moduleName: moduleName,
+        }}
+      />
+      <EncounterList
+        patientUuid={patientUuid}
+        encounterType={config.encounterTypes.tbTreatmentAndFollowUp}
+        columns={visitsColumns}
+        description={headerVisits}
+        headerTitle={headerVisits}
+        formList={[{ name: 'TPT Followup & Treatment form' }]}
+        launchOptions={{
+          hideFormLauncher: true,
+          displayText: '',
+          moduleName: moduleName,
+        }}
+      />
     </>
   );
 };
