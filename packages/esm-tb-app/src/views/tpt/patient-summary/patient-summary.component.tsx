@@ -14,11 +14,11 @@ import { moduleName } from '../../..';
 
 const TptPatientSummary: React.FC<PatientChartProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { config, obsConcepts, encounterTypes } = useConfig();
+  const { obsConcepts, encounterTypes } = useConfig();
 
   const headerRecentTPT = t('recentTptCases', 'Recent TPT Cases');
-  const headerPreviousCases = t('previousTptCases', 'Previous TPT Cases');
-  const headerVisits = t('visits', 'Visits');
+  const headerPreviousTptCases = t('previousTptCases', 'Previous TPT Cases');
+  const headerVisit = t('visits', 'Visits');
 
   const recentTbPreventionColumns: SummaryCardColumn[] = useMemo(
     () => [
@@ -74,26 +74,68 @@ const TptPatientSummary: React.FC<PatientChartProps> = ({ patientUuid }) => {
     [],
   );
 
-  const previousCasesColumns: EncounterListColumn[] = useMemo(
+  const previousTptCasesColumns: EncounterListColumn[] = useMemo(
     () => [
       {
-        key: 'tptTreatmentID',
-        header: t('tptTreatmentID', 'tpt Treatment ID'),
+        key: 'tptTreatmentId',
+        header: t('tptTreatmentId', 'TPT Treatment ID'),
+        encounterTypes: [encounterTypes.tptCaseEnrollment],
         getValue: (encounter) => {
-          return getObsFromEncounter(encounter, config.obsConcepts.tptTreatmentID);
+          return getObsFromEncounter(encounter, obsConcepts.tptTreatmentId);
+        },
+      },
+      {
+        key: 'tptEnrollmentDate',
+        header: t('enrollmentDate', 'Enrollment Date'),
+        encounterTypes: [encounterTypes.tptCaseEnrollment],
+        getValue: (encounter) => {
+          return getObsFromEncounter(encounter, obsConcepts.tptEnrollmentDate, true);
+        },
+      },
+      {
+        key: 'indication',
+        header: t('indication', 'Indication'),
+        encounterTypes: [encounterTypes.tptCaseEnrollment],
+        getValue: (encounter) => {
+          return getObsFromEncounter(encounter, obsConcepts.indication);
+        },
+      },
+      {
+        key: 'tptRegimen',
+        header: t('regimen', 'Regimen'),
+        encounterTypes: [encounterTypes.tptCaseEnrollment],
+        getValue: (encounter) => {
+          return getObsFromEncounter(encounter, obsConcepts.tptRegimen);
+        },
+      },
+      {
+        key: 'tptOutcome',
+        header: t('outcome', 'Outcome'),
+        encounterTypes: [encounterTypes.tptCaseEnrollment],
+        getValue: (encounter) => {
+          return getObsFromEncounter(encounter, obsConcepts.tptOutcome);
+        },
+      },
+      {
+        key: 'tptDateOutcome',
+        header: t('dateOutcome', 'Date of Outcome'),
+        encounterTypes: [encounterTypes.tptCaseEnrollment],
+        getValue: (encounter) => {
+          return getObsFromEncounter(encounter, obsConcepts.tptDateOutcome, true);
         },
       },
     ],
     [],
   );
 
-  const visitsColumns: EncounterListColumn[] = useMemo(
+  const tptVisitColumns: EncounterListColumn[] = useMemo(
     () => [
       {
-        key: 'tptTreatmentID',
-        header: t('tptTreatmentID', 'tpt Treatment ID'),
+        key: 'tptTreatmentId',
+        header: t('tptTreatmentId', 'TPT Treatment ID'),
+        encounterTypes: [encounterTypes.tptTreatmentAndFollowUp],
         getValue: (encounter) => {
-          return getObsFromEncounter(encounter, config.obsConcepts.tptTreatmentID);
+          return getObsFromEncounter(encounter, obsConcepts.tptTreatmentId);
         },
       },
     ],
@@ -110,10 +152,10 @@ const TptPatientSummary: React.FC<PatientChartProps> = ({ patientUuid }) => {
       />
       <EncounterList
         patientUuid={patientUuid}
-        encounterType={config.encounterTypes.tptCaseEnrollment}
-        columns={previousCasesColumns}
-        description={headerPreviousCases}
-        headerTitle={headerPreviousCases}
+        encounterType={encounterTypes.tbProgramEnrollment}
+        columns={previousTptCasesColumns}
+        description={headerPreviousTptCases}
+        headerTitle={headerPreviousTptCases}
         formList={[{ name: 'TPT Case Enrolment form' }]}
         launchOptions={{
           hideFormLauncher: true,
@@ -121,12 +163,13 @@ const TptPatientSummary: React.FC<PatientChartProps> = ({ patientUuid }) => {
           moduleName: moduleName,
         }}
       />
+
       <EncounterList
         patientUuid={patientUuid}
-        encounterType={config.encounterTypes.tbTreatmentAndFollowUp}
-        columns={visitsColumns}
-        description={headerVisits}
-        headerTitle={headerVisits}
+        encounterType={encounterTypes.tptTreatmentAndFollowUp}
+        columns={tptVisitColumns}
+        description={headerVisit}
+        headerTitle={headerVisit}
         formList={[{ name: 'TPT Followup & Treatment form' }]}
         launchOptions={{
           hideFormLauncher: true,
