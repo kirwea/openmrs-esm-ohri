@@ -67,7 +67,7 @@ const TptPatientSummary: React.FC<PatientChartProps> = ({ patientUuid }) => {
         header: t('nextAppointmentDate', 'Next Appointment Date'),
         encounterTypes: [encounterTypes.tptTreatmentAndFollowUp],
         getObsValue: (encounter) => {
-          return getObsFromEncounter(encounter, obsConcepts.tptAppointmentDate, true);
+          return getObsFromEncounter(encounter, obsConcepts.tptAppointmentDate);
         },
       },
     ],
